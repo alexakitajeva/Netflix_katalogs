@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+    <meta charset="UTF-8">
+    <title>Augšupielādēt CSV</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .upload-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-top: 50px;
+        }
+        .form-control-file {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="upload-container">
+        <h1 class="text-primary mb-4">Augšupielādēt Netflix CSV Failu</h1>
+        
+        <form id="uploadForm" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <input type="file" name="file" class="form-control-file" id="csvFile" accept=".csv" required>
+                <small class="form-text text-muted">Lūdzu, izvēlieties CSV failu</small>
+            </div>
+            <button type="submit" class="btn btn-success btn-block">Augšupielādēt</button>
+        </form>
+        
+        <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Atpakaļ</a>
+        
+        <div id="uploadStatus" class="mt-3"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('csvFile');
+            const statusDiv = document.getElementById('uploadStatus');
+            
+            if (!fileInput.files.length) {
+                statusDiv.innerHTML = '<div class="alert alert-danger">Lūdzu, izvēlieties failu!</div>';
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            if (!file.name.endsWith('.csv')) {
+                statusDiv.innerHTML = '<div class="alert alert-danger">Lūdzu, augšupielādējiet CSV failu!</div>';
+                return;
+            }
+            
+            statusDiv.innerHTML = '<div class="alert alert-info">Apstrādā failu...</div>';
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            fetch("{{ url_for('upload') }}", {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Tīkla kļūda');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === "success") {
+                    statusDiv.innerHTML = '<div class="alert alert-success">Dati veiksmīgi augšupielādēti!</div>';
+                    setTimeout(() => {
+                        window.location.href = "{{ url_for('index') }}";
+                    }, 1500);
+                } else {
+                    statusDiv.innerHTML = '<div class="alert alert-danger">Kļūda: ' + (data.message || 'Nezināma kļūda') + '</div>';
+                }
+            })
+            .catch(error => {
+                statusDiv.innerHTML = '<div class="alert alert-danger">Augšupielādes kļūda: ' + error.message + '</div>';
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix Analīze</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Netflix Analīze</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                     <li class="nav-item"><a class="nav-link" href="/">Sākums</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/visualizations">Vizualizācijas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/upload">Augšupielādēt CSV</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1 class="text-center">Netflix Filmu un Seriālu Analīze</h1>
+
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <input type="text" id="search-title" class="form-control" placeholder="Meklēt pēc nosaukuma">
+            </div>
+            <div class="col-md-4">
+                <input type="text" id="search-genre" class="form-control" placeholder="Meklēt pēc žanra">
+            </div>
+            <div class="col-md-4">
+                <input type="text" id="search-year" class="form-control" placeholder="Meklēt pēc gada">
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col text-center">
+                <button class="btn btn-primary" onclick="window.location.href='/?title='+document.getElementById('search-title').value+'&genre='+document.getElementById('search-genre').value+'&year='+document.getElementById('search-year').value">Meklēt</button>
+                <button class="btn btn-success">Augšupielādēt CSV</button>
+            </div>
+        </div>
+
+        <h2 class="mt-5">Datu vizualizācijas</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <canvas id="genreChart"></canvas>
+            </div>
+            <div class="col-md-6">
+                <canvas id="yearChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

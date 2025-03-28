@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vizualizācijas | Netflix Analīze</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container {
+            height: 400px;
+            margin-bottom: 30px;
+        }
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Netflix Analīze</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="/">Sākums</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/visualizations">Vizualizācijas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/upload">Augšupielādēt CSV</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <h1 class="text-center mb-4">Netflix Datu Vizualizācijas</h1>
+        
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Žanru Popularitāte</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="genreChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Izdošanas Gadi</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="yearChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Filmu un Seriālu Sadalījums</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="typeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Top 10 Populārākie Žanri</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="topGenresChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/get_data')
+                .then(response => response.json())
+                .then(data => {
+                    new Chart(
+                        document.getElementById('genreChart'),
+                        {
+                            type: 'bar',
+                            data: {
+                                labels: data.genres,
+                                datasets: [{
+                                    label: 'Skaits',
+                                    data: data.genre_counts,
+                                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                                    borderColor: 'rgba(54, 162, 235, 1)',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                indexAxis: 'y',
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    }
+                                },
+                                scales: {
+                                    x: {
+                                        beginAtZero: true,
+                                        title: {
+                                            display: true,
+                                            text: 'Skaits'
+                                        }
+                                    },
+                                    y: {
+                                        title: {
+                                            display: true,
+                                            text: 'Žanrs'
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    );
+
+                    new Chart(
+                        document.getElementById('yearChart'),
+                        {
+                            type: 'line',
+                            data: {
+                                labels: data.years,
+                                datasets: [{
+                                    label: 'Skaits',
+                                    data: data.year_counts,
+                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                    borderColor: 'rgba(255, 99, 132, 1)',
+                                    borderWidth: 2,
+                                    tension: 0.1,
+                                    fill: true
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        title: {
+                                            display: true,
+                                            text: 'Skaits'
+                                        }
+                                    },
+                                    x: {
+                                        title: {
+                                            display: true,
+                                            text: 'Gads'
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    );
+
+                    new Chart(
+                        document.getElementById('typeChart'),
+                        {
+                            type: 'pie',
+                            data: {
+                                labels: ['Filmas', 'Seriāli'],
+                                datasets: [{
+                                    data: [65, 35],
+                                    backgroundColor: [
+                                        'rgba(54, 162, 235, 0.7)',
+                                        'rgba(255, 99, 132, 0.7)'
+                                    ],
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'right'
+                                    }
+                                }
+                            }
+                        }
+                    );
+
+                    const top10Genres = data.genres.slice(0, 10);
+                    const top10Counts = data.genre_counts.slice(0, 10);
+                    
+                    new Chart(
+                        document.getElementById('topGenresChart'),
+                        {
+                            type: 'doughnut',
+                            data: {
+                                labels: top10Genres,
+                                datasets: [{
+                                    data: top10Counts,
+                                    backgroundColor: [
+                                        'rgba(255, 99, 132, 0.7)',
+                                        'rgba(54, 162, 235, 0.7)',
+                                        'rgba(255, 206, 86, 0.7)',
+                                        'rgba(75, 192, 192, 0.7)',
+                                        'rgba(153, 102, 255, 0.7)',
+                                        'rgba(255, 159, 64, 0.7)',
+                                        'rgba(199, 199, 199, 0.7)',
+                                        'rgba(83, 102, 255, 0.7)',
+                                        'rgba(40, 159, 64, 0.7)',
+                                        'rgba(210, 99, 132, 0.7)'
+                                    ],
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'right'
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Top 10 Žanri'
+                                    }
+                                }
+                            }
+                        }
+                    );
+                });
+        });
+    </script>
+</body>
+</html>
